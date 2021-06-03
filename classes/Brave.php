@@ -6,20 +6,30 @@ class Brave extends Human
     private $hitPoint = self::MAX_HITPOINT;
     private $attackPoint = 30;
 
-    public function __construct($name)
+    private static $instance;
+
+    private function __construct($name)
     {
         parent::__construct($name, $this->hitPoint, $this->attackPoint);
+    }
+
+    public static function getInstance ($name)
+    {
+        if(empty(self::$instance)) {
+            self::$instance = new Brave($name);
+        }
+        return self::$instance;
     }
 
     //オーバーライド
     public function doAttack($enemies)
     {
-        if ($this->hitPoint <= 0) {
+        // 自分のHPが0以上か、敵のHPが0以上かなどをチェックするメソッドを用意。
+        if (!$this->isEnableAttack($enemies)) {
             return false;
         }
-
-        $enemyIndex = rand(0, count($enemies) - 1);
-        $enemy = $enemies[$enemyIndex];
+        // ターゲットの決定
+        $enemy = $this->selectTarget($enemies);
 
         if (rand(1, 3) === 1) {
             //スキルの発動
